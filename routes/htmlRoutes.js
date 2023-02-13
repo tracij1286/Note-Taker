@@ -4,7 +4,6 @@ const path = require('path');
 
 // routing
 module.exports = (app) => {
-
   // creating routes
   // notes.html file.
   app.get('/notes', (req, res) => {

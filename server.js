@@ -3,8 +3,6 @@ const express = require('express');
 
 // express
 const app = express();
-
-// port
 const PORT = process.env.PORT || 3001;
 
 

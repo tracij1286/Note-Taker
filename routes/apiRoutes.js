@@ -1,32 +1,36 @@
-const router = require('express').Router();
+// dependencies 
+const path = require('path');
+const fs = require('fs')
 
-const store = require('../db/store');
-//
-router.get('/notes', (req, res) => {
-    store
-        .getNotes()
-        .then(notes => {
-            res.json(notes)
-        })
-        .catch(err => {
-            res.status(500).json(err)
-        })
-})
-router.post('/notes', (req, res) => {
-    console.log(req.body)
-    store
-        .addNote(req.body)
-        .then(note => {
-            res.json(note)
-        })
-        .catch(err => {
-            res.status(500).json(err)
-        })
-})
-//
-router.delete('/notes/:id', (req, res) => {
-    store
-        .removeNote(req.params.id)
-        .then(() => res.json({ ok: true }))
-        .catch(err => res.status(500).json(err))
-})
+// npm package for unique ids
+var uniqid = require('uniqid');
+
+
+// routing
+module.exports = (app) => {
+
+  // GET /api/notes should read the db.json file and return all saved notes as JSON.
+  app.get('/api/notes', (req, res) => {
+    res.sendFile(path.join(__dirname, '../db/db.json'));
+  });
+
+  // POST /api/notes should receive a new note to save on the request body, 
+  // add it to the db.json file, and then return the new note. 
+  app.post('/api/notes', (req, res) => {
+    let db = fs.readFileSync('db/db.json');
+    db = JSON.parse(db);
+    res.json(db);
+    // creating body for note
+    let userNote = {
+      title: req.body.title,
+      text: req.body.text,
+      // unique id for each note
+      id: uniqid(),
+    };
+    // pushing created note to be written in the db.json file
+    db.push(userNote);
+    fs.writeFileSync('db/db.json', JSON.stringify(db));
+    res.json(db);
+
+  });
+};
